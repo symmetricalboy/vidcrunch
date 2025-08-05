@@ -1,0 +1,236 @@
+<!DOCTYPE html><html lang="en"><head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    
+    <!-- HTML Meta Tags -->
+    <title>VidCrunch - Simple Video Compression</title>
+    <meta name="description" content="Compress large videos up to 4GB down to under 100MB using powerful local FFmpeg processing. Fast, secure, and completely private.">
+    <!-- Facebook Meta Tags -->
+    <meta property="og:url" content="https://vidcrunch.symm.app">
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="VidCrunch - Simple Video Compression">
+    <meta property="og:description" content="Compress large videos up to 4GB down to under 100MB using powerful local FFmpeg processing. Fast, secure, and completely private.">
+    <meta property="og:image" content="https://vidcrunch.symm.app/icons/opengraph.png">
+
+    <!-- Twitter Meta Tags -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta property="twitter:domain" content="vidcrunch.symm.app">
+    <meta property="twitter:url" content="https://vidcrunch.symm.app">
+    <meta name="twitter:title" content="VidCrunch - Simple Video Compression">
+    <meta name="twitter:description" content="Compress large videos up to 4GB down to under 100MB using powerful local FFmpeg processing. Fast, secure, and completely private.">
+    <meta name="twitter:image" content="https://vidcrunch.symm.app/icons/opengraph.png">
+
+    <!-- Meta Tags Generated via https://www.opengraph.xyz -->
+    
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml">
+    <link rel="manifest" href="/manifest.json">
+    <meta name="theme-color" content="#e20087">
+    <meta name="mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="apple-mobile-web-app-title" content="VidCrunch">
+    <link rel="apple-touch-icon" href="/icons/apple-touch-icon.png">
+    <!-- Security headers for SharedArrayBuffer support -->
+    <meta http-equiv="Cross-Origin-Embedder-Policy" content="require-corp">
+    <meta http-equiv="Cross-Origin-Opener-Policy" content="same-origin">
+    <!-- Disable caching for development -->
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+    <!-- Font Awesome Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@fortawesome/fontawesome-free@6.7.2/css/all.min.css" crossorigin="anonymous">
+    <!-- Google Fonts for Monospace -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600&family=Fira+Code:wght@400;500;600&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/style.css">
+    <script>
+        // Set dark theme immediately to prevent flash of unstyled content
+        document.documentElement.setAttribute('data-theme', 'dark');
+    </script>
+</head>
+<body>
+
+    <div class="app-container">
+        <header>
+            <div class="header-controls">
+                <button id="pwa-install-btn" class="install-btn" style="display: none;" title="Install VidCrunch">
+                    <i class="fas fa-download"></i>
+                </button>
+            </div>
+            <div class="header-title">
+                <img src="/icons/vidcrunch.svg" alt="VidCrunch" style="width: 48px; height: 48px; margin-right: 12px;">
+                <h1>VidCrunch</h1>
+            </div>
+            <p class="subtitle">crunch your vids down to size.</p>
+        </header>
+
+        <main class="main-workflow">
+            <!-- Target Size Selector -->
+            <section class="target-size-section">
+                <div class="target-size-container">
+                    <label for="target-size-slider" class="target-size-label">
+                        <i class="fas fa-bullseye"></i>
+                        Target Size: <span id="target-size-display">25MB</span>
+                    </label>
+                    <input type="range" id="target-size-slider" class="target-size-slider" 
+                           min="10" max="100" step="5" value="25">
+                    <div class="target-size-scale">
+                        <span>10MB</span>
+                        <span>50MB</span>
+                        <span>100MB</span>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Upload Section -->
+            <section class="upload-section" id="upload-section">
+                <div id="drop-area" class="upload-area">
+                    <div class="upload-actions">
+                        <button class="upload-btn" id="upload-button">
+                            <i class="fas fa-upload"></i> Choose File
+                        </button>
+                        <span class="upload-or">or drag & drop or paste from clipboard</span>
+                        <span class="upload-max-size">Max 2GB</span>
+                    </div>
+                    <input type="file" id="file-input" accept="video/*" style="display: none;">
+                </div>
+            </section>
+
+            <!-- Preview & Options Section -->
+            <section class="preview-section" id="preview-section" style="display: none;">
+                <div class="preview-container">
+                    <div class="file-info">
+                        <i class="fas fa-video" style="color: var(--primary-pink); margin-right: 8px;"></i>
+                        <span id="file-name-display" class="file-name">No file selected</span>
+                    </div>
+                </div>
+                
+
+
+                <div class="action-buttons">
+                    <button id="compress-btn" class="compress-btn">
+                        <i class="fas fa-compress-alt"></i>
+                        crunch it
+                    </button>
+                    <button id="clear-btn" class="clear-btn">
+                        <i class="fas fa-times"></i>
+                        Clear
+                    </button>
+                </div>
+            </section>
+            
+            <!-- Processing Section -->
+            <section class="processing-section" id="processing-section" style="display: none;">
+                <div class="processing-container">
+                    <div class="processing-animation">
+                        <div class="processing-spinner"></div>
+                    </div>
+                    <div class="processing-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill" id="progress-fill"></div>
+                        </div>
+                        <div class="progress-text" id="progress-text">Initializing...</div>
+                        <div class="compression-pass-status" id="compression-pass-status"></div>
+                    </div>
+                </div>
+            </section>
+
+            <!-- Results Section -->
+            <section class="results-section" id="results-section" style="display: none;">
+                <div class="results-container">
+                    <h2>Compression Complete</h2>
+                    <div class="compression-stats" id="compression-stats">
+                        <!-- Compression statistics will appear here -->
+                    </div>
+                    
+                    <div class="results-actions">
+                        <button id="download-compressed-btn" class="download-btn">
+                            <i class="fas fa-download"></i>
+                            Download Compressed Video
+                        </button>
+                    </div>
+                    
+                    <button id="start-over-btn" class="start-over-btn">
+                        <i class="fas fa-redo"></i>
+                        Compress Another Video
+                    </button>
+                </div>
+            </section>
+        </main>
+
+        <!-- PWA Install Section -->
+        <section class="pwa-install-section">
+            <a href="#" id="pwa-install-link" class="pwa-install-link">
+                <i class="fas fa-download"></i>
+                install the web app to crunch your vids offline.
+            </a>
+        </section>
+
+        <footer>
+            <p>Free & <a href="https://github.com/symmetricalboy/vidcrunch" target="_blank">open source</a>, for all, forever.</p>
+            <p>Copyright © 2025 Dylan Gregori Singer (<a href="https://www.symmetricalboy.com/" target="_blank">symmetricalboy</a>)</p>
+            <p><a href="#" id="privacy-link">Privacy Policy</a></p>
+            <p>v1.0.0</p>
+        </footer>
+
+    </div>
+
+
+
+
+    
+
+
+    <!-- Ko-fi Donation Link -->
+    <a href="https://ko-fi.com/symm" target="_blank" class="kofi-donation-link" title="Support this project on Ko-fi!">
+        <div class="kofi-icon-stack">
+            <i class="fas fa-mug-saucer kofi-mug"></i>
+            <i class="fas fa-heart kofi-heart"></i>
+        </div>
+    </a>
+
+    <div id="ffmpeg-status"></div>
+    
+    <!-- Privacy Policy Modal -->
+    <div id="privacy-modal" class="modal-overlay" style="display: none;">
+        <div class="modal">
+            <button class="modal-close" id="privacy-close">&times;</button>
+            <h3><i class="fas fa-shield-alt"></i> Privacy Policy</h3>
+            <div class="privacy-content">
+                <p><strong>Your privacy matters.</strong> VidCrunch processes all videos locally in your browser using WebAssembly. No data is ever sent to our servers.</p>
+                
+                <p><strong>What we don't collect:</strong></p>
+                <ul>
+                    <li>Your videos or any video content</li>
+                    <li>Personal information or accounts</li>
+                    <li>Usage analytics or tracking</li>
+                    <li>Cookies for data collection</li>
+                </ul>
+                
+                <p><strong>Local Processing:</strong> All video compression happens entirely on your device. Your files never leave your computer.</p>
+                
+                <p><strong>Open Source:</strong> Our code is publicly available for review to ensure transparency.</p>
+                
+                <p><em>Last updated: January 2025</em></p>
+            </div>
+        </div>
+    </div>
+
+    <script src="/assets/ffmpeg/ffmpeg.min.js"></script>
+    <script src="/js/main.js"></script>
+    <script>
+        // Register service worker for offline functionality
+        if ('serviceWorker' in navigator) {
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('/service-worker.js')
+                    .then(registration => {
+                        console.log('Service Worker registered:', registration);
+                    })
+                    .catch(error => {
+                        console.log('Service Worker registration failed:', error);
+                    });
+            });
+        }
+    </script>
+</body></html> 

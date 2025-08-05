@@ -1,0 +1,15 @@
+{
+  "name": "vidcrunch",
+  "version": "1.0.0",
+  "description": "Simple, powerful video compression tool that takes files up to 4GB and compresses them to under 100MB using local FFmpeg processing.",
+  "main": "server.js",
+  "scripts": {
+    "start": "node server.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2"
+  },
+  "engines": {
+    "node": "18"
+  }
+}
