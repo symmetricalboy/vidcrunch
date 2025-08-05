@@ -1,7 +1,7 @@
 {
-  "name": "VidCrunch - Simple Video Compression",
+  "name": "VidCrunch",
   "short_name": "VidCrunch",
-  "description": "Compress large videos up to 2GB down to under 100MB using powerful local FFmpeg processing. Fast, secure, and completely private.",
+  "description": "Crunch your vids down to size.",
   "start_url": ".",
   "display": "standalone",
   "background_color": "#0a0a0a",

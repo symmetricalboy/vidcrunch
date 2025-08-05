@@ -52,7 +52,7 @@ Powerful, privacy-focused video compression tool that reduces files up to 2GB do
 
 4. The app will be available at `http://localhost:8080`
 
-**Live Version:** [https://vidcrunch.symm.app](https://vidcrunch.symm.app) *(coming soon)*
+**Live Version:** [https://vidcrunch.app](https://vidcrunch.app) *(coming soon)*
 
 ## 📁 Project Structure
 
