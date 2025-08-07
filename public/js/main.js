@@ -1,4 +1,15 @@
 document.addEventListener('DOMContentLoaded', () => {
+    // Initialize PostHog analytics
+    if (typeof posthog !== 'undefined') {
+        posthog.init('phc_wkBw055GhlFSV6HrBWr2J6hBtfeqZ58vshMEk1WyG9W', {
+            api_host: 'https://us.i.posthog.com',
+            person_profiles: 'identified_only'
+        });
+        console.log('PostHog initialized successfully');
+    } else {
+        console.warn('PostHog library not loaded');
+    }
+
     // Configuration for VidCrunch
     const FFMPEG_WASM_SIZE_LIMIT = 2 * 1024 * 1024 * 1024; // 2GB hard FFmpeg.wasm limit
 const MEMORY_WARNING_SIZE = 1 * 1024 * 1024 * 1024; // 1GB warning threshold
