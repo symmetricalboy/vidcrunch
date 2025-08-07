@@ -1,13 +1,39 @@
 document.addEventListener('DOMContentLoaded', () => {
     // Initialize PostHog analytics
+    console.log('DOM Content Loaded - checking PostHog...');
+    
+    // Wait a bit for PostHog to load if it's async
+    setTimeout(() => {
+        if (typeof posthog !== 'undefined') {
+            console.log('PostHog detected, initializing...');
+            posthog.init('phc_wkBw055GhlFSV6HrBWr2J6hBtfeqZ58vshMEk1WyG9W', {
+                api_host: 'https://us.i.posthog.com',
+                person_profiles: 'identified_only',
+                debug: true, // Enable debug mode to see what's happening
+                loaded: function(posthog) {
+                    console.log('PostHog loaded successfully!');
+                    // Track page view
+                    posthog.capture('page_view', {
+                        page: 'vidcrunch_home',
+                        timestamp: new Date().toISOString()
+                    });
+                }
+            });
+            console.log('PostHog init called');
+        } else {
+            console.warn('PostHog library not loaded after timeout');
+            console.log('Window keys containing "posthog":', Object.keys(window).filter(k => k.toLowerCase().includes('posthog')));
+        }
+    }, 1000);
+    
+    // Also try immediate initialization
     if (typeof posthog !== 'undefined') {
+        console.log('PostHog available immediately');
         posthog.init('phc_wkBw055GhlFSV6HrBWr2J6hBtfeqZ58vshMEk1WyG9W', {
             api_host: 'https://us.i.posthog.com',
-            person_profiles: 'identified_only'
+            person_profiles: 'identified_only',
+            debug: true
         });
-        console.log('PostHog initialized successfully');
-    } else {
-        console.warn('PostHog library not loaded');
     }
 
     // Configuration for VidCrunch
@@ -486,11 +512,28 @@ Thank you!`);
     async function handleFile(file) {
         updateStatus('Processing file...', 'processing');
         
+        // Track file upload event
+        if (typeof posthog !== 'undefined') {
+            posthog.capture('file_uploaded', {
+                file_type: file.type,
+                file_size_mb: (file.size / 1024 / 1024).toFixed(2),
+                file_name_extension: file.name.split('.').pop()
+            });
+        }
+        
         // Validate file type - video only for VidCrunch
         const validTypes = ['video/mp4', 'video/webm', 'video/mov', 'video/avi', 'video/mkv', 'video/m4v', 'video/3gp', 'video/flv'];
         if (!validTypes.includes(file.type)) {
             updateStatus('Unsupported file type', 'error');
             showToast('Please upload a supported video file', 'error');
+            
+            // Track error
+            if (typeof posthog !== 'undefined') {
+                posthog.capture('file_upload_error', {
+                    error_type: 'unsupported_file_type',
+                    file_type: file.type
+                });
+            }
             return;
         }
 
@@ -574,6 +617,15 @@ Thank you!`);
             isProcessing = true;
             compressBtn.disabled = true;
             compressBtn.textContent = 'Processing...';
+            
+            // Track compression start
+            if (typeof posthog !== 'undefined') {
+                posthog.capture('compression_started', {
+                    file_size_mb: (originalFile.size / 1024 / 1024).toFixed(2),
+                    target_size_mb: (COMPRESSION_TARGET_SIZE / 1024 / 1024),
+                    file_type: originalFile.type
+                });
+            }
             
             showSection(processingSection);
             updateStatus('Starting video compression...', 'processing');
